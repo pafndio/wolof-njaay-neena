@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block title %}Toutes les citations - Leebu Wolof{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="page-header">
+        <h2><i class="fas fa-list"></i> Toutes les citations</h2>
+        <p>{{ total }} proverbes wolof disponibles</p>
+    </div>
+
+    <!-- Barre de recherche -->
+    <div class="search-bar">
+        <input type="text" id="search-input" placeholder="Rechercher une citation..." onkeyup="filtrerCitations()">
+        <i class="fas fa-search"></i>
+    </div>
+
+    <!-- Liste des citations -->
+    <div class="citations-grid" id="citations-grid">
+        {% for citation in citations %}
+        <div class="citation-item" data-numero="{{ citation.numero }}">
+            <div class="citation-header">
+                <span class="citation-numero">#{{ citation.numero }}</span>
+                <button class="btn-icon" onclick="copierCitation('{{ citation.leebu|replace("'", "\\'")|replace('"', '\\"') }}')" title="Copier">
+                    <i class="fas fa-copy"></i>
+                </button>
+            </div>
+            <div class="citation-body">
+                <p class="citation-texte">{{ citation.leebu }}</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Compteur de résultats -->
+    <div class="results-count">
+        <p id="results-text">{{ total }} citations affichées</p>
+    </div>
+</div>
+
+<!-- Toast notification -->
+<div id="toast" class="toast"></div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Fonction pour afficher une notification
+function showToast(message, type = 'success') {
+    const toast = document.getElementById('toast');
+    toast.textContent = message;
+    toast.className = `toast toast-${type} show`;
+    
+    setTimeout(() => {
+        toast.className = 'toast';
+    }, 3000);
+}
+
+// Fonction pour copier une citation
+function copierCitation(texte) {
+    navigator.clipboard.writeText(texte).then(() => {
+        showToast('Citation copiée !', 'success');
+    }).catch(() => {
+        showToast('Erreur lors de la copie', 'error');
+    });
+}
+
+// Fonction pour filtrer les citations
+function filtrerCitations() {
+    const input = document.getElementById('search-input');
+    const filter = input.value.toLowerCase();
+    const grid = document.getElementById('citations-grid');
+    const items = grid.getElementsByClassName('citation-item');
+    
+    let count = 0;
+    
+    for (let i = 0; i < items.length; i++) {
+        const texte = items[i].getElementsByClassName('citation-texte')[0];
+        const txtValue = texte.textContent || texte.innerText;
+        
+        if (txtValue.toLowerCase().indexOf(filter) > -1) {
+            items[i].style.display = '';
+            count++;
+        } else {
+            items[i].style.display = 'none';
+        }
+    }
+    
+    // Mettre à jour le compteur
+    document.getElementById('results-text').textContent = `${count} citation(s) affichée(s)`;
+}
+</script>
+{% endblock %}
