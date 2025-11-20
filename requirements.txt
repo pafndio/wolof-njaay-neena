@@ -1,2 +1,4 @@
-Flask
-Pillow
+kivy==2.3.0
+pyjnius==1.6.1
+plyer==2.1.0
+pillow==10.1.0
